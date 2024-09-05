@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { signInWithGoogle, saveFormData } from "../utils/firebase";
-import InputField from "./InputField";
-import Button from "./Button";
-import { getDocs, query, where, collection } from "firebase/firestore";
-import { db } from "../utils/firebase"; // Make sure to export 'db' in your firebase.js
+import React, { useState, useContext } from 'react';
+import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../utils/firebase';
+import InputField from './InputField';
+import Button from './Button';
+import AuthContext from './AuthContext';
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(false); // State to toggle between Login and Sign Up forms
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
     passwordConfirmation: "",
+    firstName: "",
+    lastName: "",
     marketingAccept: false,
   });
+  const { user } = useContext(AuthContext);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -27,7 +27,7 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      // Handle success, e.g., redirect
+      // AuthContext will handle the redirect
     } catch (error) {
       console.error("Google sign-in error:", error);
     }
@@ -35,40 +35,38 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { email, password, passwordConfirmation, firstName, lastName } = formData;
+  
     try {
       if (isLogin) {
-        // Login logic
-        const usersCollection = collection(db, "users");
-        const q = query(usersCollection, where("email", "==", formData.email));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            if (doc.data().password === formData.password) {
-              alert("Login successful!");
-              // Handle successful login
-            } else {
-              alert("Invalid password.");
-            }
-          });
-        } else {
-          alert("User not found.");
-        }
+        await signInWithEmail(email, password);
+        // AuthContext will handle the redirect
       } else {
-        // Sign Up logic
-        await saveFormData({
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          password: formData.password, // Ensure this is handled securely
-        });
-        alert("Submitted successfully!");
+        if (password !== passwordConfirmation) {
+          console.error("Passwords do not match");
+          return;
+        }
+        await signUpWithEmail(email, password, { firstName, lastName });
+        // AuthContext will handle the redirect
       }
     } catch (error) {
-      console.error('Error submitting form: ', error);
-      alert('Error submitting form!');
+      if (error.code === 'auth/invalid-email') {
+        console.error("Invalid email address.");
+      } else if (error.code === 'auth/user-not-found') {
+        console.error("User not found.");
+      } else if (error.code === 'auth/wrong-password') {
+        console.error("Incorrect password.");
+      } else {
+        console.error("An error occurred: ", error.message);
+      }
     }
   };
+  
+  React.useEffect(() => {
+    if (user) {
+      window.location.href = '/feed';
+    }
+  }, [user]);
 
   return (
     <div>
