@@ -7,7 +7,6 @@ import { AiOutlineLogout } from 'react-icons/ai';
 import { FaUserCircle } from 'react-icons/fa';
 
 const LogoutButton = () => {
-  const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -43,21 +42,15 @@ const LogoutButton = () => {
   };
 
   return (
-    <div className="relative flex items-center">
+    <div className="fixed top-0 right-0 flex items-center p-4 space-x-4">
       {loading ? (
         <span>Loading user data...</span>
       ) : (
         <>
-          {userData && (
-            <div className="profile-info flex items-center">
-              <FaUserCircle className="text-2xl text-gray-600 mr-2" />
-              <div className="user-details">
-                <p className="text-sm font-medium">{userData.displayName}</p>
-                <p className="text-xs text-gray-500">{userData.email}</p>
-              </div>
-            </div>
-          )}
-          <button onClick={handleLogout} className="absolute top-0 right-0 p-2 text-gray-600 hover:text-gray-900">
+          {/* Profile Icon */}
+          <FaUserCircle className="text-3xl text-gray-600 cursor-pointer" />
+          {/* Logout Button */}
+          <button onClick={handleLogout} className="p-2 text-gray-600 hover:text-gray-900">
             <AiOutlineLogout size={24} />
           </button>
         </>
