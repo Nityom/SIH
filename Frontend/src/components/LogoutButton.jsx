@@ -41,6 +41,11 @@ const LogoutButton = () => {
     }
   };
 
+  const handleProfileClick = () => {
+    // Redirect to the user profile page
+    navigate("/user-profile");
+  };
+
   return (
     <div className="fixed top-0 right-0 flex items-center p-4 space-x-4">
       {loading ? (
@@ -48,7 +53,10 @@ const LogoutButton = () => {
       ) : (
         <>
           {/* Profile Icon */}
-          <FaUserCircle className="text-3xl text-gray-600 cursor-pointer" />
+          <FaUserCircle
+            className="text-3xl text-gray-600 cursor-pointer"
+            onClick={handleProfileClick} // Navigate to user profile on click
+          />
           {/* Logout Button */}
           <button onClick={handleLogout} className="p-2 text-gray-600 hover:text-gray-900">
             <AiOutlineLogout size={24} />
