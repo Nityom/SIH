@@ -1,39 +1,27 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../utils/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const auth = getAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser && window.location.pathname === '/login') {
         navigate('/feed');
-      } else {
-        setUser(null);
-        navigate('/login');
       }
     });
 
     return () => unsubscribe();
-  }, [auth, navigate]);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      navigate('/login');
-    } catch (error) {
-      console.error("Sign out error:", error);
-    }
-  };
+  }, [navigate]);
 
   return (
-    <AuthContext.Provider value={{ user, handleSignOut }}>
+    <AuthContext.Provider value={{ user }}>
       {children}
     </AuthContext.Provider>
   );

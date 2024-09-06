@@ -13,11 +13,10 @@ const AppRoutes = () => {
   return (
     <div className="relative min-h-screen bg-gray-100">
       {!isLoginPage && <LogoutButton />}
-      <Routes> 
-   
+      <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/feed" element={<Feed />} />
-          <Route path="/user-profile" element={<UserProfile />} />
+        <Route path="/user-profile" element={<UserProfile />} />
         {/* Add other routes here */}
       </Routes>
     </div>
